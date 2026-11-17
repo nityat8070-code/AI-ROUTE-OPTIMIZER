@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Route Optimizer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/"> <span class="brand-mark">⌁</span> Route<span>IQ</span></a>
+    <nav><a href="#planner">Route Planner</a><a href="#methods">Methods</a><a href="#about">About</a></nav>
+    <span class="live-pill"><i></i> OPTIMIZATION ENGINE</span>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span></span> SMART MOBILITY · NUMERICAL COMPUTING</div>
+        <h1>Find a smarter<br><em>way forward.</em></h1>
+        <p>Explore route choices with an optimization engine powered by graph algorithms, Newton-Raphson and Bisection numerical methods.</p>
+        <a class="primary-link" href="#planner">Plan a route <b>↗</b></a>
+      </div>
+      <div class="hero-visual">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="route-line"></div>
+        <div class="map-pin pin-a">A</div><div class="map-pin pin-b">B</div>
+        <div class="floating-card"><span class="mini-label">OPTIMIZED PATH</span><strong>Route intelligence</strong><small>Distance · Time · Congestion</small></div>
+        <div class="visual-tag">01 / ROUTE OPTIMIZATION</div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div><strong>02</strong><span>Numerical methods</span></div>
+      <div><strong>01</strong><span>Route engine</span></div>
+      <div><strong>03</strong><span>Route profiles</span></div>
+      <div><strong>100%</strong><span>Explainable calculations</span></div>
+    </section>
+
+    <section class="section" id="planner">
+      <div class="section-heading"><div><div class="eyebrow">01 — INTERACTIVE TOOL</div><h2>Plan your journey</h2></div><p>Choose two locations to calculate a route and inspect the numerical method iterations.</p></div>
+      <div class="planner-grid">
+        <div class="panel input-panel">
+          <div class="panel-kicker">JOURNEY DETAILS</div>
+          <label for="source">Starting point</label>
+          <select id="source">{% for location in locations %}<option>{{ location }}</option>{% endfor %}</select>
+          <label for="destination">Destination</label>
+          <select id="destination">{% for location in locations %}<option {% if location == 'Airport' %}selected{% endif %}>{{ location }}</option>{% endfor %}</select>
+          <label for="method">Numerical method</label>
+          <select id="method"><option value="both">Compare both methods</option><option value="newton">Newton-Raphson only</option><option value="bisection">Bisection only</option></select>
+          <button id="optimizeBtn" class="button">Optimize route <span>→</span></button>
+          <p class="hint">Demo network · Illustrative road and traffic values, not live data.</p>
+          <div id="error" class="error"></div>
+        </div>
+        <div class="panel map-panel">
+          <div class="map-heading"><div><span class="panel-kicker">ROUTE PREVIEW</span><strong id="mapTitle">Your route will appear here</strong></div><span class="map-status">SCHEMATIC MAP</span></div>
+          <div id="map"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section results-section hidden">
+      <div class="section-heading"><div><div class="eyebrow">02 — OPTIMIZATION OUTPUT</div><h2>Your route insights</h2></div><p>Results are calculated by the local demo road graph and selected numerical method.</p></div>
+      <div class="metric-grid">
+        <div class="metric"><span>DISTANCE</span><strong id="distance">—</strong><small>kilometres</small></div>
+        <div class="metric"><span>ESTIMATED TIME</span><strong id="time">—</strong><small>minutes (illustrative)</small></div>
+        <div class="metric"><span>CONGESTION INDEX</span><strong id="congestion">—</strong><small>lower is better</small></div>
+        <div class="metric accent"><span>OPTIMAL WEIGHT</span><strong id="weight">—</strong><small>numerically calculated</small></div>
+      </div>
+      <div class="panel route-panel"><div class="panel-kicker">RECOMMENDED PATH</div><div id="path" class="path"></div><p id="modelNote" class="hint"></p></div>
+      <div class="two-panels">
+        <div class="panel"><div class="panel-kicker">ROUTE PROFILE COMPARISON</div><div id="candidates" class="candidate-list"></div></div>
+        <div class="panel"><div class="panel-kicker">OPTIMIZATION MODEL</div><h3>Find the best penalty weight</h3><p class="model-equation">f(w) = 2w − 1.4 = 0</p><p class="hint">The numerical methods solve for the congestion penalty weight w. That value is then used by the route cost function: distance + 0.20 × time + w × congestion.</p><div id="rootSummary" class="root-summary"></div></div>
+      </div>
+      <div class="two-panels method-panels">
+        <div class="panel"><div class="panel-kicker">METHOD 01</div><h3>Newton-Raphson</h3><div id="newtonDetails"></div></div>
+        <div class="panel"><div class="panel-kicker">METHOD 02</div><h3>Bisection</h3><div id="bisectionDetails"></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="methods">
+      <div class="section-heading"><div><div class="eyebrow">03 — THE MATHEMATICS</div><h2>Two methods. One objective.</h2></div><p>Both methods approximate a root of the optimization equation using different numerical strategies.</p></div>
+      <div class="method-intro-grid">
+        <article class="method-card"><div class="method-number">01</div><h3>Newton-Raphson</h3><p>Uses the function and its derivative to move toward a root through successive tangent-line estimates.</p><div class="formula">wₙ₊₁ = wₙ − f(wₙ) / f′(wₙ)</div></article>
+        <article class="method-card"><div class="method-number">02</div><h3>Bisection</h3><p>Repeatedly halves an interval whose endpoints have function values with opposite signs.</p><div class="formula">m = (a + b) / 2</div></article>
+      </div>
+    </section>
+    <section class="footer-note" id="about"><span class="brand-mark">⌁</span><div><strong>RouteIQ</strong><p>Academic demonstration of route optimization and numerical root-finding.</p></div><span class="footer-right">BUILT FOR LEARNING · 2026</span></section>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
